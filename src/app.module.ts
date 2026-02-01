@@ -18,6 +18,7 @@ import { AssetsModule } from './modules/assets/assets.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { DownloadsModule } from './modules/downloads/downloads.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { StorageModule } from './modules/storage/storage.module';
     OrdersModule,
     PaymentsModule,
     StorageModule,
+    DownloadsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

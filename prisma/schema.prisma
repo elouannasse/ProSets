@@ -43,8 +43,9 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  vendorAssets Asset[]  @relation("VendorAssets")
+  vendorAssets Asset[]    @relation("VendorAssets")
   orders       Order[]
+  downloads    Download[]
 
   @@index([email])
   @@index([auth0Id])
@@ -67,8 +68,9 @@ model Asset {
   updatedAt     DateTime    @updatedAt
 
   // Relations
-  vendor User    @relation("VendorAssets", fields: [vendorId], references: [id], onDelete: Cascade)
-  orders Order[]
+  vendor        User       @relation("VendorAssets", fields: [vendorId], references: [id], onDelete: Cascade)
+  orders        Order[]
+  downloadLogs  Download[]
 
   @@index([vendorId])
   @@index([status])
@@ -114,4 +116,20 @@ model Payment {
   @@index([orderId])
   @@index([status])
   @@map("payments")
+
+model Download {
+  id        String   @id @default(uuid())
+  userId    String
+  assetId   String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([assetId])
+  @@index([createdAt])
+  @@map("downloads")
+}
 }
