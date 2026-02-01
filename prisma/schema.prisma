@@ -52,17 +52,19 @@ model User {
 }
 
 model Asset {
-  id           String      @id @default(uuid())
-  title        String
-  description  String      @db.Text
-  price        Decimal     @db.Decimal(10, 2)
-  category     String
-  previewUrls  String[]
-  sourceFileKey String     @unique
-  vendorId     String
-  status       AssetStatus @default(ACTIVE)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id            String      @id @default(uuid())
+  title         String
+  description   String      @db.Text
+  price         Decimal     @db.Decimal(10, 2)
+  category      String
+  previewUrls   String[]
+  sourceFileKey String      @unique
+  vendorId      String
+  status        AssetStatus @default(ACTIVE)
+  downloads     Int         @default(0)
+  deletedAt     DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   // Relations
   vendor User    @relation("VendorAssets", fields: [vendorId], references: [id], onDelete: Cascade)
@@ -71,6 +73,8 @@ model Asset {
   @@index([vendorId])
   @@index([status])
   @@index([category])
+  @@index([price])
+  @@index([deletedAt])
   @@map("assets")
 }
 
