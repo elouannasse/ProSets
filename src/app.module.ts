@@ -19,6 +19,8 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { DownloadsModule } from './modules/downloads/downloads.module';
+import { StatsModule } from './modules/stats/stats.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -43,6 +45,8 @@ import { DownloadsModule } from './modules/downloads/downloads.module';
     PaymentsModule,
     StorageModule,
     DownloadsModule,
+    StatsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
