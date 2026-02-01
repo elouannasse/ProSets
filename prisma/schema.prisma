@@ -1,0 +1,113 @@
+// Prisma Schema for ProSets Backend
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CLIENT
+  VENDEUR
+  ADMIN
+}
+
+enum AssetStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  auth0Id   String   @unique
+  role      UserRole @default(CLIENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  vendorAssets Asset[]  @relation("VendorAssets")
+  orders       Order[]
+
+  @@index([email])
+  @@index([auth0Id])
+  @@map("users")
+}
+
+model Asset {
+  id           String      @id @default(uuid())
+  title        String
+  description  String      @db.Text
+  price        Decimal     @db.Decimal(10, 2)
+  category     String
+  previewUrls  String[]
+  sourceFileKey String     @unique
+  vendorId     String
+  status       AssetStatus @default(ACTIVE)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relations
+  vendor User    @relation("VendorAssets", fields: [vendorId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@index([vendorId])
+  @@index([status])
+  @@index([category])
+  @@map("assets")
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  userId          String
+  assetId         String
+  status          OrderStatus @default(PENDING)
+  totalAmount     Decimal     @db.Decimal(10, 2)
+  stripeSessionId String?     @unique
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  asset    Asset     @relation(fields: [assetId], references: [id], onDelete: Restrict)
+  payments Payment[]
+
+  @@index([userId])
+  @@index([assetId])
+  @@index([status])
+  @@map("orders")
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  orderId         String
+  stripePaymentId String        @unique
+  amount          Decimal       @db.Decimal(10, 2)
+  status          PaymentStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status])
+  @@map("payments")
+}
